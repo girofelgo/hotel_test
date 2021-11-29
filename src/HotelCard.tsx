@@ -1,5 +1,19 @@
-import { Card, CardContent, Rating, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  Paper,
+  Rating,
+  Typography,
+} from "@mui/material";
 import { Flex } from "./App";
+import Carousel from "react-material-ui-carousel";
+import styled from "@emotion/styled";
+
+const StyledCarousel = styled(Carousel)`
+  width: 300px;
+  height: 200px;
+`;
 
 export const HotelCard = ({ hotel }: { hotel: any }) => {
   return (
@@ -8,7 +22,11 @@ export const HotelCard = ({ hotel }: { hotel: any }) => {
         <Flex flexDirection="row" justifyContent="space-between">
           <Flex>
             <Flex>
-              <div>placeholder for image component</div>
+              <StyledCarousel autoPlay={false}>
+                {hotel.images?.map((image: any, i: any) => (
+                  <img src={image.url} alt="" height="300" width="400" />
+                ))}
+              </StyledCarousel>
             </Flex>
             <Flex flexDirection="column">
               <Typography sx={{ fontSize: 16 }} color="text.primary">
