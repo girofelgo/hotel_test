@@ -5,15 +5,35 @@ import { HotelCard } from "./HotelCard";
 
 type IValue = number;
 
-const Flex = styled.div<{ flexDirection?: string }>`
+interface IFlexProps {
+  flexDirection?: string;
+  justifyContent?: string;
+  alignSelf?: string;
+}
+
+export const Flex = styled.div<IFlexProps>`
   display: flex;
   flex-direction: ${({ flexDirection = "row" }) => flexDirection};
+  justify-content: ${({ justifyContent = "start" }) => justifyContent};
+  align-self: ${({ alignSelf = "start" }) => alignSelf};
 `;
 
 const Controls = styled.div`
   flex-direction: row;
   display: flex;
-  height: 50px;
+  margin: 0 auto 20px;
+  justify-content: space-between;
+  border: 1px solid gray;
+  width: 500px;
+`;
+
+const StyledText = styled(Typography)`
+  margin-right: 5px;
+`;
+
+const ActionIcon = styled.div`
+  cursor: pointer;
+  margin-right: 5px;
 `;
 
 const hotels = [
@@ -360,31 +380,31 @@ function App() {
             }}
           />
           <Flex>
-            <Typography>Adults</Typography>
-            <Typography onClick={() => setAdultCount(adultCount + 1)}>
+            <StyledText>Adults</StyledText>
+            <ActionIcon onClick={() => setAdultCount(adultCount + 1)}>
               +
-            </Typography>
-            <Typography>{adultCount}</Typography>
-            <Typography
+            </ActionIcon>
+            <StyledText>{adultCount}</StyledText>
+            <ActionIcon
               onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
             >
               -
-            </Typography>
+            </ActionIcon>
           </Flex>
           <Flex>
-            <Typography>Children</Typography>
-            <Typography onClick={() => setChildCount(childCount + 1)}>
+            <StyledText>Children</StyledText>
+            <ActionIcon onClick={() => setChildCount(childCount + 1)}>
               +
-            </Typography>
-            <Typography>{childCount}</Typography>
-            <Typography
+            </ActionIcon>
+            <StyledText>{childCount}</StyledText>
+            <ActionIcon
               onClick={() => childCount > 0 && setChildCount(childCount - 1)}
             >
               -
-            </Typography>
+            </ActionIcon>
           </Flex>
         </Controls>
-        <Grid direction="column" container spacing={4}>
+        <Grid direction="column" container spacing={4} rowSpacing={2}>
           {hotels.map((hotel) => (
             <HotelCard key={hotel.name} hotel={hotel} />
           ))}
