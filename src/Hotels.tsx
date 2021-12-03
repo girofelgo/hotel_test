@@ -55,24 +55,18 @@ export const Hotels = (props: any) => {
   const [hotels, setHotels] = React.useState<any>(null);
   const [rooms, setRooms] = React.useState<any>(null);
 
-  const derivedHotels = React.useMemo(() => {
-    return (
-      hotels &&
-      hotels.filter(
-        (item: { starRating: string }) => parseInt(item.starRating) >= rating
-      )
-    );
-  }, [hotels, rating]);
-
   React.useEffect(() => {
     axios.get(hotelUrl).then((response) => {
       setHotels(response.data);
     });
   }, []);
 
-  React.useEffect(() => {
-    if (derivedHotels) {
-      const hotelIds = derivedHotels.map((item: any) => item.id);
+  const derivedHotels = React.useMemo(() => {
+    if (hotels) {
+      const returnHotels = hotels.filter(
+        (item: { starRating: string }) => parseInt(item.starRating) >= rating
+      );
+      const hotelIds = returnHotels.map((item: any) => item.id);
       axios
         .all(hotelIds.map((id: string) => axios.get(getRoomsUrl(id))))
         .then((responses: any) => {
@@ -82,31 +76,41 @@ export const Hotels = (props: any) => {
             )
           );
         });
+      return returnHotels;
     }
-  }, [derivedHotels]);
+  }, [hotels, rating]);
 
   const hotelsDerivedFromRooms = React.useMemo(() => {
-    if (rooms && derivedHotels) {
-      const occupancies = (hotel: any) =>
-        rooms
-          .find((room: any) => room.hotelId === hotel.id)
-          .rooms.filter(
-            (room: any) =>
-              room.occupancy.maxOverall >= totalCount &&
-              room.occupancy.maxChildren >= childCount &&
-              room.occupancy.maxAdults >= adultCount
-          ).length > 0;
-      return derivedHotels?.filter((hotel: any) => occupancies(hotel));
+    if (rooms?.length > 0 && derivedHotels?.length > 0 && totalCount > 0) {
+      return derivedHotels?.filter(
+        (hotel: any) =>
+          rooms?.length > 0 &&
+          rooms.length === derivedHotels?.length &&
+          rooms
+            .find((room: any) => room.hotelId === hotel.id)
+            .rooms.filter(
+              (room: any) =>
+                (room.occupancy.maxAdults >= adultCount &&
+                  room.occupancy.maxChildren >= childCount &&
+                  !room.occupancy.maxOverall) ||
+                (room.occupancy.maxOverall >= totalCount &&
+                  room.occupancy.maxAdults >= adultCount &&
+                  room.occupancy.maxChildren >= childCount)
+            ).length > 0
+      );
+    } else {
+      return derivedHotels;
     }
   }, [adultCount, childCount, rooms, derivedHotels, totalCount]);
 
-  console.log(hotels, derivedHotels, rooms, adultCount, hotelsDerivedFromRooms);
+  console.log(hotels, derivedHotels, rooms, totalCount, hotelsDerivedFromRooms);
 
   return (
     <div className="App">
       <Container maxWidth="lg">
         <Controls>
           <Rating
+            defaultValue={1}
             name="simple-controlled"
             value={rating}
             onChange={(event, value) => {
@@ -139,7 +143,7 @@ export const Hotels = (props: any) => {
           </Flex>
         </Controls>
         <Grid direction="column" container spacing={4} rowSpacing={2}>
-          {derivedHotels &&
+          {hotelsDerivedFromRooms &&
             hotelsDerivedFromRooms.map((hotel: any) => (
               <HotelCard key={hotel.name} hotel={hotel} />
             ))}

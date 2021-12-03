@@ -24,7 +24,13 @@ export const HotelCard = ({ hotel }: { hotel: any }) => {
             <Flex>
               <StyledCarousel autoPlay={false}>
                 {hotel.images?.map((image: any, i: any) => (
-                  <img src={image.url} alt="" height="300" width="400" />
+                  <img
+                    src={image.url}
+                    key={i}
+                    alt=""
+                    height="300"
+                    width="400"
+                  />
                 ))}
               </StyledCarousel>
             </Flex>
