@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, Rating, Typography } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import styled from "@emotion/styled";
@@ -19,7 +20,36 @@ const StyledRoomWrapper = styled.div`
   }
 `;
 
-export const HotelCard = ({ hotel, rooms }: { hotel: any; rooms: any }) => {
+interface IHotelCardProps {
+  childCount: number;
+  adultCount: number;
+  totalCount: number;
+  hotel: any;
+  rooms: any;
+}
+
+export const HotelCard = ({
+  hotel,
+  rooms,
+  childCount,
+  adultCount,
+  totalCount,
+}: IHotelCardProps) => {
+  const derivedRooms = React.useMemo(() => {
+    return (
+      rooms &&
+      rooms.filter(
+        (room: any) =>
+          (room.occupancy.maxAdults >= adultCount &&
+            room.occupancy.maxChildren >= childCount &&
+            !room.occupancy.maxOverall) ||
+          (room.occupancy.maxOverall >= totalCount &&
+            room.occupancy.maxAdults >= adultCount &&
+            room.occupancy.maxChildren >= childCount)
+      )
+    );
+  }, [adultCount, childCount, rooms, totalCount]);
+
   return (
     <Card>
       <CardContent>
@@ -58,8 +88,8 @@ export const HotelCard = ({ hotel, rooms }: { hotel: any; rooms: any }) => {
             <Rating name="read-only" readOnly value={hotel.starRating} />
           </Flex>
         </Flex>
-        {rooms &&
-          rooms.map((room: any) => (
+        {derivedRooms &&
+          derivedRooms.map((room: any) => (
             <StyledRoomWrapper>
               <Flex margin="0 50px 0 0" flexDirection="column">
                 <Typography sx={{ fontSize: 20 }} color="text.primary">

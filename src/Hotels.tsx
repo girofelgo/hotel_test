@@ -164,6 +164,9 @@ export const Hotels = (props: any) => {
                   <HotelCard
                     key={hotel.name}
                     hotel={hotel}
+                    childCount={childCount}
+                    adultCount={adultCount}
+                    totalCount={totalCount}
                     rooms={
                       rooms &&
                       rooms.find((room: any) => room.hotelId === hotel.id).rooms
