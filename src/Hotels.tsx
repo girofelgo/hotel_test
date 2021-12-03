@@ -3,6 +3,7 @@ import { Box, Container, Grid, Paper, Rating, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 import { HotelCard } from "./HotelCard";
 import axios from "axios";
+import hotelPlaceholder from "./assets/hotel_placeholder.jpeg";
 
 type IValue = number;
 
@@ -28,18 +29,25 @@ const Controls = styled.div`
   display: flex;
   margin: 0 auto 20px;
   justify-content: space-between;
-  border: 1px solid gray;
+  border: 2px double rgba(0, 0, 0, 0.3);
   width: 500px;
 `;
 
 const StyledText = styled(Typography)`
   margin-right: 5px;
+  font-size: 20px;
 `;
 
 const ActionIcon = styled.div`
   cursor: pointer;
-  showMore(switch): void;
   margin-right: 5px;
+  line-height: 26px;
+`;
+
+const HeaderBanner = styled.img`
+  height: 300px;
+  width: 100%;
+  margin-bottom: 20px;
 `;
 
 const hotelUrl =
@@ -112,8 +120,10 @@ export const Hotels = (props: any) => {
   return (
     <div className="App">
       <Container maxWidth="lg">
+        <HeaderBanner src={hotelPlaceholder} alt="hotel placeholder" />
         <Controls>
           <Rating
+            size="large"
             defaultValue={1}
             name="simple-controlled"
             value={rating}
