@@ -77,8 +77,6 @@ export const Hotels = (props: any) => {
     }
   }, [adultCount, childCount, roomCollection, derivedHotels, totalCount]);
 
-  // console.log(hotels, derivedHotels, rooms, totalCount, hotelsDerivedFromRooms);
-
   const getHotelRooms = (rooms: HotelRoomCollection[], hotel: Hotel) =>
     rooms &&
     (rooms as HotelRoomCollection[]).find(
