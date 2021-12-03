@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Grid, Rating, Typography } from "@mui/material";
+import { Box, Container, Grid, Paper, Rating, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 import { HotelCard } from "./HotelCard";
 import axios from "axios";
@@ -10,6 +10,8 @@ interface IFlexProps {
   flexDirection?: string;
   justifyContent?: string;
   alignSelf?: string;
+  margin?: string;
+  border?: string;
 }
 
 export const Flex = styled.div<IFlexProps>`
@@ -17,6 +19,8 @@ export const Flex = styled.div<IFlexProps>`
   flex-direction: ${({ flexDirection = "row" }) => flexDirection};
   justify-content: ${({ justifyContent = "start" }) => justifyContent};
   align-self: ${({ alignSelf = "start" }) => alignSelf};
+  margin: ${({ margin = "0" }) => margin};
+  border: ${({ border = "none" }) => border};
 `;
 
 const Controls = styled.div`
@@ -142,10 +146,21 @@ export const Hotels = (props: any) => {
             </ActionIcon>
           </Flex>
         </Controls>
-        <Grid direction="column" container spacing={4} rowSpacing={2}>
+        <Grid direction="column" container spacing={2} rowSpacing={2}>
           {hotelsDerivedFromRooms &&
             hotelsDerivedFromRooms.map((hotel: any) => (
-              <HotelCard key={hotel.name} hotel={hotel} />
+              <Grid item xs={4}>
+                <Paper>
+                  <HotelCard
+                    key={hotel.name}
+                    hotel={hotel}
+                    rooms={
+                      rooms &&
+                      rooms.find((room: any) => room.hotelId === hotel.id).rooms
+                    }
+                  />
+                </Paper>
+              </Grid>
             ))}
         </Grid>
       </Container>
