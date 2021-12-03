@@ -29,7 +29,6 @@ const Controls = styled.div`
   display: flex;
   margin: 0 auto 20px;
   justify-content: space-between;
-  border: 2px double rgba(0, 0, 0, 0.3);
   width: 500px;
 `;
 
@@ -119,48 +118,50 @@ export const Hotels = (props: any) => {
 
   return (
     <div className="App">
+      <HeaderBanner src={hotelPlaceholder} alt="hotel placeholder" />
       <Container maxWidth="lg">
-        <HeaderBanner src={hotelPlaceholder} alt="hotel placeholder" />
-        <Controls>
-          <Rating
-            size="large"
-            defaultValue={1}
-            name="simple-controlled"
-            value={rating}
-            onChange={(event, value) => {
-              setRating(value as number);
-            }}
-          />
-          <Flex>
-            <StyledText>Adults</StyledText>
-            <ActionIcon onClick={() => setAdultCount(adultCount + 1)}>
-              +
-            </ActionIcon>
-            <StyledText>{adultCount}</StyledText>
-            <ActionIcon
-              onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
-            >
-              -
-            </ActionIcon>
-          </Flex>
-          <Flex>
-            <StyledText>Children</StyledText>
-            <ActionIcon onClick={() => setChildCount(childCount + 1)}>
-              +
-            </ActionIcon>
-            <StyledText>{childCount}</StyledText>
-            <ActionIcon
-              onClick={() => childCount > 0 && setChildCount(childCount - 1)}
-            >
-              -
-            </ActionIcon>
-          </Flex>
-        </Controls>
+        <Paper elevation={8} sx={{ width: 1 / 2, margin: "0 auto" }}>
+          <Controls>
+            <Rating
+              size="large"
+              defaultValue={1}
+              name="simple-controlled"
+              value={rating}
+              onChange={(event, value) => {
+                setRating(value as number);
+              }}
+            />
+            <Flex>
+              <StyledText>Adults</StyledText>
+              <ActionIcon onClick={() => setAdultCount(adultCount + 1)}>
+                +
+              </ActionIcon>
+              <StyledText>{adultCount}</StyledText>
+              <ActionIcon
+                onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
+              >
+                -
+              </ActionIcon>
+            </Flex>
+            <Flex>
+              <StyledText>Children</StyledText>
+              <ActionIcon onClick={() => setChildCount(childCount + 1)}>
+                +
+              </ActionIcon>
+              <StyledText>{childCount}</StyledText>
+              <ActionIcon
+                onClick={() => childCount > 0 && setChildCount(childCount - 1)}
+              >
+                -
+              </ActionIcon>
+            </Flex>
+          </Controls>
+        </Paper>
         <Grid direction="column" container spacing={2} rowSpacing={2}>
-          {hotelsDerivedFromRooms &&
+          {hotelsDerivedFromRooms?.length ? (
             hotelsDerivedFromRooms.map((hotel: any) => (
               <Grid item xs={4}>
-                <Paper>
+                <Paper elevation={5}>
                   <HotelCard
                     key={hotel.name}
                     hotel={hotel}
@@ -174,7 +175,22 @@ export const Hotels = (props: any) => {
                   />
                 </Paper>
               </Grid>
-            ))}
+            ))
+          ) : (
+            <Paper
+              sx={{
+                width: 1 / 2,
+                textAlign: "center",
+                margin: "0 auto",
+                height: "100px",
+              }}
+            >
+              {" "}
+              <Typography sx={{ fontSize: 24, marginTop: "20px" }}>
+                No hotels match the selected criteria.
+              </Typography>
+            </Paper>
+          )}
         </Grid>
       </Container>
     </div>
