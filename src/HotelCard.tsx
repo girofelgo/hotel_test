@@ -1,32 +1,7 @@
 import React from "react";
 import { Card, CardContent, Rating, Typography } from "@mui/material";
-import Carousel from "react-material-ui-carousel";
-import styled from "@emotion/styled";
-import { Flex } from "./Hotels";
-
-const StyledCarousel = styled(Carousel)`
-  width: 300px;
-  height: 200px;
-`;
-
-const StyledRoomWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  margin: 0 0 15px 0;
-  padding: 10px 0;
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-  }
-`;
-
-interface IHotelCardProps {
-  childCount: number;
-  adultCount: number;
-  totalCount: number;
-  hotel: any;
-  rooms: any;
-}
+import { Flex, StyledCarousel, StyledRoomWrapper } from "./styled/components";
+import { IHotelCardProps } from "./interfaces";
 
 export const HotelCard = ({
   hotel,
@@ -85,7 +60,11 @@ export const HotelCard = ({
             </Flex>
           </Flex>
           <Flex>
-            <Rating name="read-only" readOnly value={hotel.starRating} />
+            <Rating
+              name="read-only"
+              readOnly
+              value={parseInt(hotel.starRating)}
+            />
           </Flex>
         </Flex>
         {derivedRooms &&

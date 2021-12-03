@@ -1,53 +1,11 @@
 import React from "react";
-import { Box, Container, Grid, Paper, Rating, Typography } from "@mui/material";
-import styled from "@emotion/styled";
+import { Container, Grid, Paper, Typography } from "@mui/material";
 import { HotelCard } from "./HotelCard";
 import axios from "axios";
 import hotelPlaceholder from "./assets/hotel_placeholder.jpeg";
-
-type IValue = number;
-
-interface IFlexProps {
-  flexDirection?: string;
-  justifyContent?: string;
-  alignSelf?: string;
-  margin?: string;
-  border?: string;
-}
-
-export const Flex = styled.div<IFlexProps>`
-  display: flex;
-  flex-direction: ${({ flexDirection = "row" }) => flexDirection};
-  justify-content: ${({ justifyContent = "start" }) => justifyContent};
-  align-self: ${({ alignSelf = "start" }) => alignSelf};
-  margin: ${({ margin = "0" }) => margin};
-  border: ${({ border = "none" }) => border};
-`;
-
-const Controls = styled.div`
-  flex-direction: row;
-  display: flex;
-  margin: 0 auto 20px;
-  justify-content: space-between;
-  width: 500px;
-`;
-
-const StyledText = styled(Typography)`
-  margin-right: 5px;
-  font-size: 20px;
-`;
-
-const ActionIcon = styled.div`
-  cursor: pointer;
-  margin-right: 5px;
-  line-height: 26px;
-`;
-
-const HeaderBanner = styled.img`
-  height: 300px;
-  width: 100%;
-  margin-bottom: 20px;
-`;
+import { Hotel, HotelRoomCollection, IValue, Room } from "./interfaces";
+import { HeaderBanner } from "./styled/components";
+import { FilterControls } from "./FilterControls";
 
 const hotelUrl =
   "https://obmng.dbm.guestline.net/api/hotels?collection-id=OBMNG";
@@ -55,7 +13,7 @@ const getRoomsUrl = (id: string) =>
   `https://obmng.dbm.guestline.net/api/roomRates/OBMNG/${id}`;
 
 export const Hotels = (props: any) => {
-  const [rating, setRating] = React.useState<number>(1);
+  const [rating, setRating] = React.useState<IValue>(1);
   const [adultCount, setAdultCount] = React.useState<IValue>(0);
   const [childCount, setChildCount] = React.useState<IValue>(0);
   const totalCount = React.useMemo(
@@ -63,8 +21,10 @@ export const Hotels = (props: any) => {
     [adultCount, childCount]
   );
 
-  const [hotels, setHotels] = React.useState<any>(null);
-  const [rooms, setRooms] = React.useState<any>(null);
+  const [hotels, setHotels] = React.useState<Hotel[] | null>(null);
+  const [roomCollection, setRoomCollection] = React.useState<
+    HotelRoomCollection[] | null
+  >(null);
 
   React.useEffect(() => {
     axios.get(hotelUrl).then((response) => {
@@ -77,11 +37,11 @@ export const Hotels = (props: any) => {
       const returnHotels = hotels.filter(
         (item: { starRating: string }) => parseInt(item.starRating) >= rating
       );
-      const hotelIds = returnHotels.map((item: any) => item.id);
+      const hotelIds = returnHotels.map((item: Hotel) => item.id);
       axios
         .all(hotelIds.map((id: string) => axios.get(getRoomsUrl(id))))
         .then((responses: any) => {
-          setRooms(
+          setRoomCollection(
             responses.map((res: any, i: number) =>
               Object.assign({}, { hotelId: hotelIds[i], rooms: res.data.rooms })
             )
@@ -92,19 +52,22 @@ export const Hotels = (props: any) => {
   }, [hotels, rating]);
 
   const hotelsDerivedFromRooms = React.useMemo(() => {
-    if (rooms?.length > 0 && derivedHotels?.length > 0 && totalCount > 0) {
+    if (roomCollection && derivedHotels && totalCount > 0) {
       return derivedHotels?.filter(
-        (hotel: any) =>
-          rooms?.length > 0 &&
-          rooms.length === derivedHotels?.length &&
-          rooms
-            .find((room: any) => room.hotelId === hotel.id)
+        (hotel: Hotel) =>
+          roomCollection.length > 0 &&
+          roomCollection.length === derivedHotels?.length &&
+          roomCollection
+            .find(
+              (roomCollection: HotelRoomCollection) =>
+                roomCollection.hotelId === hotel.id
+            )!
             .rooms.filter(
-              (room: any) =>
+              (room: Room) =>
                 (room.occupancy.maxAdults >= adultCount &&
                   room.occupancy.maxChildren >= childCount &&
                   !room.occupancy.maxOverall) ||
-                (room.occupancy.maxOverall >= totalCount &&
+                (room.occupancy.maxOverall! >= totalCount &&
                   room.occupancy.maxAdults >= adultCount &&
                   room.occupancy.maxChildren >= childCount)
             ).length > 0
@@ -112,54 +75,32 @@ export const Hotels = (props: any) => {
     } else {
       return derivedHotels;
     }
-  }, [adultCount, childCount, rooms, derivedHotels, totalCount]);
+  }, [adultCount, childCount, roomCollection, derivedHotels, totalCount]);
 
-  console.log(hotels, derivedHotels, rooms, totalCount, hotelsDerivedFromRooms);
+  // console.log(hotels, derivedHotels, rooms, totalCount, hotelsDerivedFromRooms);
+
+  const getHotelRooms = (rooms: HotelRoomCollection[], hotel: Hotel) =>
+    rooms &&
+    (rooms as HotelRoomCollection[]).find(
+      (roomCollection: HotelRoomCollection) =>
+        roomCollection.hotelId === hotel.id
+    )!.rooms!;
 
   return (
     <div className="App">
       <HeaderBanner src={hotelPlaceholder} alt="hotel placeholder" />
       <Container maxWidth="lg">
-        <Paper elevation={8} sx={{ width: 1 / 2, margin: "0 auto" }}>
-          <Controls>
-            <Rating
-              size="large"
-              defaultValue={1}
-              name="simple-controlled"
-              value={rating}
-              onChange={(event, value) => {
-                setRating(value as number);
-              }}
-            />
-            <Flex>
-              <StyledText>Adults</StyledText>
-              <ActionIcon onClick={() => setAdultCount(adultCount + 1)}>
-                +
-              </ActionIcon>
-              <StyledText>{adultCount}</StyledText>
-              <ActionIcon
-                onClick={() => adultCount > 0 && setAdultCount(adultCount - 1)}
-              >
-                -
-              </ActionIcon>
-            </Flex>
-            <Flex>
-              <StyledText>Children</StyledText>
-              <ActionIcon onClick={() => setChildCount(childCount + 1)}>
-                +
-              </ActionIcon>
-              <StyledText>{childCount}</StyledText>
-              <ActionIcon
-                onClick={() => childCount > 0 && setChildCount(childCount - 1)}
-              >
-                -
-              </ActionIcon>
-            </Flex>
-          </Controls>
-        </Paper>
+        <FilterControls
+          setRating={setRating}
+          setAdultCount={setAdultCount}
+          setChildCount={setChildCount}
+          rating={rating}
+          adultCount={adultCount}
+          childCount={childCount}
+        />
         <Grid direction="column" container spacing={2} rowSpacing={2}>
           {hotelsDerivedFromRooms?.length ? (
-            hotelsDerivedFromRooms.map((hotel: any) => (
+            hotelsDerivedFromRooms.map((hotel: Hotel) => (
               <Grid item xs={4}>
                 <Paper elevation={5}>
                   <HotelCard
@@ -169,8 +110,7 @@ export const Hotels = (props: any) => {
                     adultCount={adultCount}
                     totalCount={totalCount}
                     rooms={
-                      rooms &&
-                      rooms.find((room: any) => room.hotelId === hotel.id).rooms
+                      roomCollection && getHotelRooms(roomCollection, hotel)
                     }
                   />
                 </Paper>
