@@ -6,9 +6,9 @@ import {
   Rating,
   Typography,
 } from "@mui/material";
-import { Flex } from "./App";
 import Carousel from "react-material-ui-carousel";
 import styled from "@emotion/styled";
+import { Flex } from "./Hotels";
 
 const StyledCarousel = styled(Carousel)`
   width: 300px;
@@ -41,7 +41,7 @@ export const HotelCard = ({ hotel }: { hotel: any }) => {
             </Flex>
           </Flex>
           <Flex>
-            <Rating name="read-only" readOnly value={3} />
+            <Rating name="read-only" readOnly value={hotel.starRating} />
           </Flex>
         </Flex>
       </CardContent>
